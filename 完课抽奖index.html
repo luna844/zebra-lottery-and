@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>斑马思维完课抽奖活动</title>
+    <meta name="description" content="恭喜完成斑马思维课程，参与抽奖赢取好礼！">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #e74c3c;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            margin-top: 0;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+        }
+        
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 8px solid #e74c3c;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.21, 0.99);
+            background-color: #e74c3c;
+        }
+        
+        .slice {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            left: 0;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #e74c3c;
+            z-index: 10;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
+        }
+        
+        #spin-btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        #spin-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.4);
+        }
+        
+        #spin-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-container {
+            width: 100%;
+            max-width: 350px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            min-height: 60px;
+        }
+        
+        .result .prize {
+            color: #e74c3c;
+            font-size: 22px;
+            margin: 10px 0;
+        }
+        
+        .result .prize-list {
+            margin: 15px 0;
+            padding: 0;
+            list-style-type: none;
+        }
+        
+        .result .prize-list li {
+            margin: 8px 0;
+            padding: 8px;
+            background-color: #ffebee;
+            border-radius: 5px;
+        }
+        
+        .result .notice {
+            color: #e74c3c;
+            background-color: #ffebee;
+            padding: 10px 15px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        
+        .attempts {
+            margin-top: 15px;
+            color: #7f8c8d;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .share-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .share-btn {
+            padding: 10px 25px;
+            background-color: #07C160;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(7, 193, 96, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .share-btn:hover {
+            background-color: #06AD56;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(7, 193, 96, 0.4);
+        }
+        
+        .share-btn i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        
+        @media (max-width: 480px) {
+            .wheel-container {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <h1>斑马思维完课抽奖活动</h1>
+        <p>恭喜完成课程，快来试试手气吧！</p>
+    </div>
+    
+    <div class="wheel-container">
+        <div id="wheel"></div>
+        <div class="pointer"></div>
+    </div>
+    
+    <button id="spin-btn">开始抽奖</button>
+    
+    <div class="result-container">
+        <div class="result" id="result"></div>
+        <div class="attempts" id="attempts">剩余抽奖次数: 2</div>
+    </div>
+    
+    <div class="share-container">
+        <button class="share-btn" id="share-btn">
+            <i class="fas fa-share-alt"></i>分享给好友
+        </button>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 奖品配置
+            const prizes = [
+                { name: "奖品1", color: "#e74c3c", weight: 25 },
+                { name: "奖品2", color: "#c0392b", weight: 25 },
+                { name: "奖品3", color: "#d35400", weight: 25 },
+                { name: "奖品4", color: "#a04000", weight: 25 }
+            ];
+            
+            // 初始化变量
+            let spinning = false;
+            let attempts = 2;
+            let wonPrizes = [];
+            let currentPrizes = [];
+            
+            // 创建转盘
+            function createWheel() {
+                const wheel = $('#wheel');
+                wheel.empty();
+                
+                const anglePerSlice = 360 / prizes.length;
+                
+                prizes.forEach((prize, index) => {
+                    // 如果奖品已经被抽中，显示为灰色
+                    const bgColor = wonPrizes.includes(prize.name) ? "#95a5a6" : prize.color;
+                    
+                    const slice = $('<div class="slice"></div>');
+                    slice.css({
+                        'transform': `rotate(${index * anglePerSlice}deg) skewY(${90 - anglePerSlice}deg)`,
+                        'background-color': bgColor
+                    });
+                    
+                    const text = $('<div style="transform: skewY(' + (anglePerSlice - 90) + 'deg) rotate(' + (anglePerSlice / 2) + 'deg); width: 50px; text-align: center;">' + prize.name + '</div>');
+                    slice.append(text);
+                    
+                    wheel.append(slice);
+                });
+            }
+            
+            // 初始化转盘
+            createWheel();
+            
+            // 抽奖函数
+            function spinWheel() {
+                if (spinning || attempts <= 0) return;
+                
+                spinning = true;
+                $('#spin-btn').prop('disabled', true);
+                
+                // 确保100%中奖且不重复
+                const remainingPrizes = prizes.filter(p => !wonPrizes.includes(p.name));
+                const randomIndex = Math.floor(Math.random() * remainingPrizes.length);
+                const selectedPrize = remainingPrizes[randomIndex];
+                
+                // 计算停止位置
+                const prizeIndex = prizes.findIndex(p => p.name === selectedPrize.name);
+                const anglePerSlice = 360 / prizes.length;
+                const targetAngle = 360 * 5 + (prizeIndex * anglePerSlice) + (anglePerSlice / 2);
+                
+                // 旋转动画
+                $('#wheel').css('transform', 'rotate(' + (-targetAngle) + 'deg)');
+                
+                // 旋转结束后
+                setTimeout(function() {
+                    spinning = false;
+                    attempts--;
+                    
+                    // 记录已获奖项
+                    wonPrizes.push(selectedPrize.name);
+                    currentPrizes.push(selectedPrize.name);
+                    
+                    // 更新UI
+                    if (attempts > 0) {
+                        // 第一次抽奖后的显示
+                        $('#result').html(`
+                            <div>恭喜您获得了:</div>
+                            <div class="prize">${selectedPrize.name}</div>
+                            <div class="notice">截图联系班主任领奖</div>
+                        `);
+                        $('#attempts').text('剩余抽奖次数: ' + attempts);
+                        $('#spin-btn').prop('disabled', false);
+                        
+                        // 重置转盘，已抽中的奖品变灰
+                        createWheel();
+                    } else {
+                        // 第二次抽奖后的显示
+                        $('#result').html(`
+                            <div>恭喜您获得了以下奖品:</div>
+                            <ul class="prize-list">
+                                <li>${currentPrizes[0]}</li>
+                                <li>${currentPrizes[1]}</li>
+                            </ul>
+                            <div class="notice">截图联系班主任领奖</div>
+                        `);
+                        $('#attempts').text('抽奖已结束');
+                        $('#spin-btn').text('抽奖结束').prop('disabled', true);
+                    }
+                    
+                    // 更新分享内容
+                    updateShareConfig();
+                }, 4000);
+            }
+            
+            // 微信分享配置
+            function updateShareConfig() {
+                if (typeof WeixinJSBridge === 'undefined') return;
+                
+                const shareTitle = currentPrizes.length > 0 
+                    ? `我抽中了${currentPrizes.join('和')}！你也来试试` 
+                    : "斑马思维完课抽奖活动";
+                
+                const shareDesc = currentPrizes.length > 0
+                    ? "我刚在斑马思维抽奖活动中获得了" + currentPrizes.join('和') + "，你也快来参加吧！"
+                    : "恭喜完成斑马思维课程，参与抽奖赢取好礼！";
+                
+                // 设置分享内容
+                WeixinJSBridge.invoke('updateAppMessageShareData', {
+                    "title": shareTitle,
+                    "desc": shareDesc,
+                    "link": window.location.href,
+                    "imgUrl": "https://via.placeholder.com/150x150.png/0077C160/FFFFFF?text=斑马思维"
+                }, function(res) {});
+                
+                WeixinJSBridge.invoke('updateTimelineShareData', {
+                    "title": shareTitle,
+                    "link": window.location.href,
+                    "imgUrl": "https://via.placeholder.com/150x150.png/0077C160/FFFFFF?text=斑马思维"
+                }, function(res) {});
+            }
+            
+            // 初始化微信分享
+            function initWeixinShare() {
+                if (typeof WeixinJSBridge === 'undefined') {
+                    document.addEventListener('WeixinJSBridgeReady', initWeixinShare, false);
+                    return;
+                }
+                
+                // 设置默认分享内容
+                updateShareConfig();
+                
+                // 自定义"分享给朋友"按钮点击事件
+                WeixinJSBridge.on('menu:share:appmessage', function(argv){
+                    WeixinJSBridge.invoke('sendAppMessage', {
+                        "title": currentPrizes.length > 0 
+                            ? `我抽中了${currentPrizes.join('和')}！你也来试试` 
+                            : "斑马思维完课抽奖活动",
+                        "desc": currentPrizes.length > 0
+                            ? "我刚在斑马思维抽奖活动中获得了" + currentPrizes.join('和') + "，你也快来参加吧！"
+                            : "恭喜完成斑马思维课程，参与抽奖赢取好礼！",
+                        "link": window.location.href,
+                        "imgUrl": "https://via.placeholder.com/150x150.png/0077C160/FFFFFF?text=斑马思维"
+                    }, function(res) {
+                        // 分享回调
+                    });
+                });
+                
+                // 自定义"分享到朋友圈"按钮点击事件
+                WeixinJSBridge.on('menu:share:timeline', function(argv){
+                    WeixinJSBridge.invoke('shareTimeline', {
+                        "title": currentPrizes.length > 0 
+                            ? `斑马思维抽奖-我抽中了${currentPrizes.join('和')}` 
+                            : "斑马思维完课抽奖活动",
+                        "link": window.location.href,
+                        "imgUrl": "https://via.placeholder.com/150x150.png/0077C160/FFFFFF?text=斑马思维"
+                    }, function(res) {
+                        // 分享回调
+                    });
+                });
+            }
+            
+            // 绑定按钮事件
+            $('#spin-btn').click(spinWheel);
+            
+            // 绑定分享按钮事件
+            $('#share-btn').click(function() {
+                if (typeof WeixinJSBridge !== 'undefined') {
+                    WeixinJSBridge.invoke('shareAppMessage', {
+                        "title": currentPrizes.length > 0 
+                            ? `我抽中了${currentPrizes.join('和')}！你也来试试` 
+                            : "斑马思维完课抽奖活动",
+                        "desc": currentPrizes.length > 0
+                            ? "我刚在斑马思维抽奖活动中获得了" + currentPrizes.join('和') + "，你也快来参加吧！"
+                            : "恭喜完成斑马思维课程，参与抽奖赢取好礼！",
+                        "link": window.location.href,
+                        "imgUrl": "https://via.placeholder.com/150x150.png/0077C160/FFFFFF?text=斑马思维"
+                    });
+                } else {
+                    alert('请点击微信右上角菜单分享给朋友');
+                }
+            });
+            
+            // 初始化微信分享
+            initWeixinShare();
+        });
+    </script>
+</body>
+</html>
